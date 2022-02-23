@@ -78,8 +78,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY|ControlMask,           XK_h,      setmfact,       {.f = -0.02} },
+	{ MODKEY|ControlMask,           XK_l,      setmfact,       {.f = +0.02} },
 	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
@@ -125,5 +125,23 @@ static Button buttons[] = {
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
+};
+
+static const char *ipcsockpath = "/tmp/dwm.sock";
+static IPCCommand ipccommands[] = {
+  IPCCOMMAND(  view,                1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  toggleview,          1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  tag,                 1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  toggletag,           1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  tagmon,              1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  focusmon,            1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  focusstack,          1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  zoom,                1,      {ARG_TYPE_NONE}   ),
+  IPCCOMMAND(  incnmaster,          1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  killclient,          1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  togglefloating,      1,      {ARG_TYPE_NONE}   ),
+  IPCCOMMAND(  setmfact,            1,      {ARG_TYPE_FLOAT}  ),
+  IPCCOMMAND(  setlayoutsafe,       1,      {ARG_TYPE_PTR}    ),
+  IPCCOMMAND(  quit,                1,      {ARG_TYPE_NONE}   )
 };
 
