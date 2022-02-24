@@ -315,7 +315,7 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon, *lastselmon;
 static Window root, wmcheckwin;
-/* static xcb_connection_t *xcon; */
+static xcb_connection_t *xcon;
 
 #include "ipc.h"
 
