@@ -26,6 +26,7 @@ static const char *colors[][3]      = {
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6" };
 
+/* rules */
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
@@ -33,7 +34,7 @@ static const Rule rules[] = {
 	 */
 	/* class     instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
 	{ "Gimp",       NULL,     NULL,           0,         1,          0,           0,        -1 },
-	{ "Firefox",    NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
+	{ "Firefox",    NULL,     NULL,           0,         0,          0,          -1,        -1 },
 	{ "Alacritty",  NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ NULL,         NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
@@ -67,50 +68,56 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *roficmd[] = { "rofi", "-show", "run", "-display-run", NULL };
 static const char *termcmd[]  = { "alacritty", NULL };
+static const char *lfcmd[]  = { "alacritty", "-e", "lf", NULL };
+
+/* custom func declarations */
+static void unfloatvisible(const Arg *arg);
+static void togglefullscr(const Arg *arg);
 
 #include "movestack.c"
 static Key keys[] = {
-	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_Shift_R,spawn,          {.v = roficmd } },
-	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_l,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-  { MODKEY,                       XK_h,      focusmaster,    {0} },
-	{ MODKEY|ControlMask,           XK_j,      incnmaster,     {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_k,      incnmaster,     {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_h,      setmfact,       {.f = -0.02} },
-	{ MODKEY|ControlMask,           XK_l,      setmfact,       {.f = +0.02} },
-	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
-	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY,                       XK_q,      killclient,     {0} },
-	{ MODKEY,                       XK_a,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_s,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	{ MODKEY,                       XK_space,  setlayout,      {0} },
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_equal,  changegaps,     {.i = -6 } },
-	{ MODKEY,                       XK_minus,  changegaps,     {.i = +6 } },
-	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 18  } },
-	{ MODKEY|ShiftMask,             XK_minus,  setgaps,        {.i = 48  } },
-	TAGKEYS(                        XK_1,                      0)
-	TAGKEYS(                        XK_2,                      1)
-	TAGKEYS(                        XK_3,                      2)
-	TAGKEYS(                        XK_4,                      3)
-	TAGKEYS(                        XK_5,                      4)
-	TAGKEYS(                        XK_6,                      5)
-	TAGKEYS(                        XK_7,                      6)
-	TAGKEYS(                        XK_8,                      7)
-	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	/* modifier                key            function        argument */
+	{ MODKEY,                  XK_Shift_R,    spawn,          {.v = roficmd } },
+	{ MODKEY,                  XK_Return,     spawn,          {.v = termcmd } },
+	{ MODKEY,                  XK_BackSpace,  spawn,          {.v = lfcmd } },
+	/* { MODKEY,                  XK_b,          togglebar,      {0} }, */
+	{ MODKEY,                  XK_j,          focusstack,     {.i = +1 } },
+	{ MODKEY,                  XK_l,          focusstack,     {.i = +1 } },
+	{ MODKEY,                  XK_k,          focusstack,     {.i = -1 } },
+  { MODKEY,                  XK_h,          focusmaster,    {0} },
+	{ MODKEY|ControlMask,      XK_j,          incnmaster,     {.i = +1 } },
+	{ MODKEY|ControlMask,      XK_k,          incnmaster,     {.i = -1 } },
+	{ MODKEY|ControlMask,      XK_h,          setmfact,       {.f = -0.02} },
+	{ MODKEY|ControlMask,      XK_l,          setmfact,       {.f = +0.02} },
+	{ MODKEY|ShiftMask,        XK_j,          movestack,      {.i = +1 } },
+	{ MODKEY|ShiftMask,        XK_k,          movestack,      {.i = -1 } },
+	{ MODKEY,                  XK_Tab,        view,           {0} },
+	{ MODKEY,                  XK_q,          killclient,     {0} },
+	{ MODKEY,                  XK_a,          setlayout,      {.v = &layouts[0]} },
+	{ MODKEY,                  XK_s,          setlayout,      {.v = &layouts[1]} },
+	{ MODKEY,                  XK_m,          setlayout,      {.v = &layouts[2]} },
+  { MODKEY,                  XK_f,          togglefullscr,  {0} },
+	{ MODKEY|ShiftMask,        XK_a,          unfloatvisible, {0} },
+	{ MODKEY,                  XK_0,          view,           {.ui = ~0 } },
+	{ MODKEY|ShiftMask,        XK_0,          tag,            {.ui = ~0 } },
+	{ MODKEY,                  XK_comma,      focusmon,       {.i = -1 } },
+	{ MODKEY,                  XK_period,     focusmon,       {.i = +1 } },
+	{ MODKEY|ShiftMask,        XK_comma,      tagmon,         {.i = -1 } },
+	{ MODKEY|ShiftMask,        XK_period,     tagmon,         {.i = +1 } },
+	{ MODKEY,                  XK_equal,      changegaps,     {.i = -6 } },
+	{ MODKEY,                  XK_minus,      changegaps,     {.i = +6 } },
+	{ MODKEY|ShiftMask,        XK_equal,      setgaps,        {.i = 18  } },
+	{ MODKEY|ShiftMask,        XK_minus,      setgaps,        {.i = 48  } },
+	TAGKEYS(                   XK_1,                          0)
+	TAGKEYS(                   XK_2,                          1)
+	TAGKEYS(                   XK_3,                          2)
+	TAGKEYS(                   XK_4,                          3)
+	TAGKEYS(                   XK_5,                          4)
+	/* TAGKEYS(                   XK_6,                          5) */
+	/* TAGKEYS(                   XK_7,                          6) */
+	/* TAGKEYS(                   XK_8,                          7) */
+	/* TAGKEYS(                   XK_9,                          8) */
+	{ MODKEY|ShiftMask,        XK_q,          quit,           {0} },
 };
 
 /* button definitions */
@@ -148,3 +155,25 @@ static IPCCommand ipccommands[] = {
   IPCCOMMAND(  quit,                1,      {ARG_TYPE_NONE}   )
 };
 
+/* Custom Funcs */
+void
+unfloatvisible(const Arg *arg)
+{
+    Client *c;
+
+    for (c = selmon->clients; c; c = c->next)
+        if (ISVISIBLE(c) && c->isfloating)
+            c->isfloating = c->isfixed;
+
+    if (arg && arg->v)
+        setlayout(arg);
+    else
+        arrange(selmon);
+}
+
+void
+togglefullscr(const Arg *arg)
+{
+  if(selmon->sel)
+    setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
+}
