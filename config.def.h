@@ -36,6 +36,7 @@ static const Rule rules[] = {
 	{ "Gimp",       NULL,     NULL,           0,         1,          0,           0,        -1 },
 	{ "Firefox",    NULL,     NULL,           0,         0,          0,          -1,        -1 },
 	{ "Alacritty",  NULL,     NULL,           0,         0,          1,           0,        -1 },
+	{ "Kitty",      NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ NULL,         NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
 
@@ -67,7 +68,7 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *roficmd[] = { "rofi", "-show", "run", "-display-run", NULL };
-static const char *termcmd[]  = { "alacritty", NULL };
+static const char *termcmd[]  = { "kitty", NULL };
 static const char *lfcmd[]  = { "alacritty", "-e", "lf", NULL };
 
 /* custom func declarations */
