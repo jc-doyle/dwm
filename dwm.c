@@ -803,7 +803,7 @@ void
 destroynotify(XEvent *e)
 {
 	Client *c;
-	Monitor *m;
+	/* Monitor *m; */
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
 	if ((c = wintoclient(ev->window)))
