@@ -69,7 +69,7 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char *roficmd[] = { "rofi", "-show", "run", "-display-run", NULL };
 /* static const char *termcmd[]  = { "kitty", "--listen-on", "unix:@kittysocket", NULL }; */
 static const char *termcmd[]  = { "kitty", NULL };
-static const char *lfcmd[]  = { "alacritty", "-e", "lf", NULL };
+static const char *lfcmd[]  = { "kitty", "lf", NULL };
 
 /* custom func declarations */
 static void unfloatvisible(const Arg *arg);
@@ -115,6 +115,7 @@ static Key keys[] = {
 	TAGKEYS(                   XK_4,                          3)
 	TAGKEYS(                   XK_5,                          4)
 	TAGKEYS(                   XK_6,                          5)
+	TAGKEYS(                   XK_Escape,                     5)
 	/* TAGKEYS(                   XK_7,                          6) */
 	/* TAGKEYS(                   XK_8,                          7) */
 	/* TAGKEYS(                   XK_9,                          8) */
