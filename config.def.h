@@ -109,6 +109,8 @@ static Key keys[] = {
 	{ MODKEY,                  XK_minus,      changegaps,     {.i = +6 } },
 	{ MODKEY|ShiftMask,        XK_equal,      setgaps,        {.i = 18  } },
 	{ MODKEY|ShiftMask,        XK_minus,      setgaps,        {.i = 48  } },
+	{ MODKEY|ShiftMask,        XK_u,          view_adjacent,  {.i = +1 } },
+	{ MODKEY|ShiftMask,        XK_i,          view_adjacent,  {.i = -1 } },
 	TAGKEYS(                   XK_1,                          0)
 	TAGKEYS(                   XK_2,                          1)
 	TAGKEYS(                   XK_3,                          2)
@@ -179,3 +181,27 @@ togglefullscr(const Arg *arg)
   if(selmon->sel)
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
 }
+
+// View next/previous tags
+void
+view_adjacent(const Arg *arg)
+{
+	int i, curtags;
+	int seltag = 0;
+	Arg a;
+
+	curtags = selmon->tagset[selmon->seltags];
+	for(i = 0; i < LENGTH(tags); i++)
+		if(curtags & (1 << i)){
+			seltag = i;
+			break;
+		}
+
+	seltag = (seltag + arg->i) % (int)LENGTH(tags);
+	if(seltag < 0)
+		seltag += LENGTH(tags);
+
+	a.i = (1 << seltag);
+	view(&a);
+}
+
